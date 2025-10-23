@@ -1,27 +1,32 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { fetchRandomWord } from "../services/randomWordApi";
 import { generateAvailableLetters, initializeSelectedLetters } from "../utils";
-import { Letter } from "../types";
+import { Letter, PexelsPhoto } from "../types";
+import pexels from "../services/pexels";
 
 interface UseGameReturn {
   word: string | undefined;
   availableLetters: Letter[];
   selectedLetters: Array<Letter | null>;
-  isLoading: boolean;
+  images: PexelsPhoto[];
+  isLoadingGame: boolean;
   error: string | null;
   isVictory: boolean;
   handleAvailableLetterPress: (id: string) => void;
   handleSelectedLetterPress: (id: string | null) => void;
-  handleSolutionPress: () => void;
-  fetchWord: () => Promise<void>;
-  resetGame: () => void;
+  handleClearPress: () => void;
+  fetchData: () => Promise<void>;
+  resetGame: () => Promise<void>;
 }
 
 export function useGame(): UseGameReturn {
   const [word, setWord] = useState<string | undefined>();
   const [availableLetters, setAvailableLetters] = useState<Letter[]>([]);
-  const [selectedLetterIds, setSelectedLetterIds] = useState<Array<string | null>>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [selectedLetterIds, setSelectedLetterIds] = useState<
+    Array<string | null>
+  >([]);
+  const [images, setImages] = useState<PexelsPhoto[]>([]);
+  const [isLoadingGame, setIsLoadingGame] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isVictory, setIsVictory] = useState<boolean>(false);
 
@@ -42,11 +47,11 @@ export function useGame(): UseGameReturn {
     return wordFound === word.toLowerCase();
   }, [selectedLetterIds, selectedLetters, word]);
 
-  const fetchWord = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     const wordLength = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
 
     try {
-      setIsLoading(true);
+      setIsLoadingGame(true);
       setError(null);
       setIsVictory(false);
 
@@ -57,10 +62,24 @@ export function useGame(): UseGameReturn {
       setWord(recoveredWord);
       setAvailableLetters(letters);
       setSelectedLetterIds(initializedSelected);
+
+      console.log("word fetched :", recoveredWord);
+
+      const res: any = await pexels.photos.search({
+        query: recoveredWord,
+        per_page: 4,
+      });
+
+      if (res.photos && res.photos.length > 0) {
+        setImages(res.photos as PexelsPhoto[]);
+      } else {
+        setImages([]);
+      }
     } catch (err) {
-      setError("Failed to load word");
+      setError("Failed to load word or images");
+      setImages([]);
     } finally {
-      setIsLoading(false);
+      setIsLoadingGame(false);
     }
   }, []);
 
@@ -107,7 +126,7 @@ export function useGame(): UseGameReturn {
     [selectedLetterIds, availableLetters]
   );
 
-  const handleSolutionPress = useCallback(() => {
+  const handleClearPress = useCallback(() => {
     const newAvailableLetters = availableLetters.map((letter) => ({
       ...letter,
       isSelected: false,
@@ -120,13 +139,9 @@ export function useGame(): UseGameReturn {
   }, [availableLetters, selectedLetterIds]);
 
   const resetGame = useCallback(async () => {
+    await fetchData();
     setIsVictory(false);
-    setWord(undefined);
-    setAvailableLetters([]);
-    setSelectedLetterIds([]);
-
-    await fetchWord();
-  }, [fetchWord]);
+  }, [fetchData]);
 
   useEffect(() => {
     if (checkVictory && !isVictory) {
@@ -135,20 +150,21 @@ export function useGame(): UseGameReturn {
   }, [checkVictory, isVictory]);
 
   useEffect(() => {
-    fetchWord();
-  }, [fetchWord]);
+    fetchData();
+  }, [fetchData]);
 
   return {
     word,
     availableLetters,
     selectedLetters,
-    isLoading,
+    images,
+    isLoadingGame,
     error,
     isVictory,
     handleAvailableLetterPress,
     handleSelectedLetterPress,
-    handleSolutionPress,
-    fetchWord,
+    handleClearPress,
+    fetchData,
     resetGame,
   };
 }

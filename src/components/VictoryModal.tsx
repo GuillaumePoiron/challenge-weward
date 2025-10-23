@@ -25,8 +25,8 @@ export function VictoryModal({ visible, onNextWord }: VictoryModalProps) {
             <View style={styles.buttonContainer}>
               <LinearGradient
                 colors={[
-                  COLORS.solutionButtonGradientStart,
-                  COLORS.solutionButtonGradientEnd,
+                  COLORS.clearButtonGradientStart,
+                  COLORS.clearButtonGradientEnd,
                 ]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: SCREEN_WIDTH / 2,
-    backgroundColor: COLORS.solutionButtonBackground,
+    backgroundColor: COLORS.clearButtonBackground,
     borderRadius: 4,
     transform: [{ translateY: 4 }],
     marginTop: 16,

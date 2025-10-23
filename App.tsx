@@ -3,14 +3,12 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useImages } from "./src/hooks/useImages";
 import { useGame } from "./src/hooks/useGame";
 import { Background } from "./src/components/Background";
 import { ImageGrid } from "./src/components/ImageGrid";
 import { SelectedLetterGrid } from "./src/components/SelectedLetterGrid";
 import { AvailableLetterGrid } from "./src/components/AvailableLetterGrid";
 import { VictoryModal } from "./src/components/VictoryModal";
-import { COLORS } from "./src/constants/colors";
 import { StatusBar } from "expo-status-bar";
 import { LoadingScreen } from "./src/components/LoadingScreen";
 import { ErrorScreen } from "./src/components/ErrorScreen";
@@ -26,46 +24,34 @@ export default function App() {
     word,
     availableLetters,
     selectedLetters,
-    isLoading: isGameLoading,
+    images,
+    isLoadingGame,
     error: gameError,
     isVictory,
     handleAvailableLetterPress,
     handleSelectedLetterPress,
-    handleSolutionPress,
-    fetchWord,
+    handleClearPress,
+    fetchData,
     resetGame,
   } = useGame();
 
-  const {
-    images,
-    isLoading: isImagesLoading,
-    error: imagesError,
-  } = useImages(word);
+  const isLoading = !fontsLoaded || isLoadingGame;
+  const hasError = fontError || gameError;
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    if (!isLoading || hasError) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
-
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  }, [isLoading, hasError]);
 
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
       <Background>
-        {!fontsLoaded && !fontError ? (
+        {isLoading ? (
           <LoadingScreen />
-        ) : isGameLoading || isImagesLoading ? (
-          <LoadingScreen />
-        ) : gameError || imagesError ? (
-          <ErrorScreen
-            gameError={gameError}
-            imagesError={imagesError}
-            fetchWord={fetchWord}
-          />
+        ) : hasError ? (
+          <ErrorScreen gameError={gameError} fetchWord={fetchData} />
         ) : (
           <>
             <View style={styles.container}>
@@ -78,7 +64,7 @@ export default function App() {
               <AvailableLetterGrid
                 availableLetters={availableLetters}
                 handleAvailableLetterPress={handleAvailableLetterPress}
-                handleSolutionPress={handleSolutionPress}
+                handleClearPress={handleClearPress}
               />
             </View>
             <VictoryModal visible={isVictory} onNextWord={resetGame} />

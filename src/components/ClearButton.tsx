@@ -1,21 +1,23 @@
+import { memo } from "react";
 import { View, StyleSheet, Text, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../constants/colors";
 import { SCREEN_WIDTH } from "../constants/dimensions";
 import BrushIcon from "./icons/BrushIcon";
 
-interface ButtonSolutionProps {
+
+interface ClearButtonProps {
   onPress: () => void;
 }
 
-export const SolutionButton = ({ onPress }: ButtonSolutionProps) => {
+export const ClearButton = memo(({ onPress }: ClearButtonProps) => {
   return (
     <Pressable onPress={onPress}>
       <View style={styles.buttonContainer}>
         <LinearGradient
           colors={[
-            COLORS.solutionButtonGradientStart,
-            COLORS.solutionButtonGradientEnd,
+            COLORS.clearButtonGradientStart,
+            COLORS.clearButtonGradientEnd,
           ]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -31,12 +33,12 @@ export const SolutionButton = ({ onPress }: ButtonSolutionProps) => {
       </View>
     </Pressable>
   );
-};
+});
 
 const styles = StyleSheet.create({
   buttonContainer: {
     flex: 1,
-    backgroundColor: COLORS.solutionButtonBackground,
+    backgroundColor: COLORS.clearButtonBackground,
     borderRadius: 4,
     transform: [{ translateY: 4 }],
     marginBottom: 4,

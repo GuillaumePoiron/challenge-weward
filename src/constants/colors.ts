@@ -11,9 +11,9 @@ export const COLORS = {
     availableButtonShadow: "#969696",
     emptyAvailableButton: "#343e53",
 
-    solutionButtonBackground: "#358100",
-    solutionButtonGradientStart: "#b0d800",
-    solutionButtonGradientEnd: "#5ca600",
+    clearButtonBackground: "#358100",
+    clearButtonGradientStart: "#b0d800",
+    clearButtonGradientEnd: "#5ca600",
 
     black: "#000000",
     white: "#ffffff",

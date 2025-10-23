@@ -3,13 +3,11 @@ import { COLORS } from "../constants/colors";
 
 interface ErrorScreenProps {
   gameError: string | null;
-  imagesError: string | null;
   fetchWord: () => void;
 }
 
 export function ErrorScreen({
   gameError,
-  imagesError,
   fetchWord,
 }: ErrorScreenProps) {
   return (
@@ -17,7 +15,7 @@ export function ErrorScreen({
       <Text style={styles.titleError}>Oops</Text>
       <Text style={styles.textError}>
         An error has occurred{"\n"}
-        {gameError || imagesError}
+        {gameError}
       </Text>
       <Text style={styles.textCheckConnection}>
         Please check your internet connection
